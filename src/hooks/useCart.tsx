@@ -32,14 +32,27 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     return [];
   });
 
+  console.log('carrinho', cart)
+
+  // Adicionar um produto ao carrinho //
   const addProduct = async (productId: number) => {
     try {
-      // TODO
+      let response = await api.get(`/products/${productId}`);
+
+      response.data = {
+        ...response.data,
+        amount: 1
+      }
+
+      setCart([...cart, response.data]);
+
     } catch {
       // TODO
     }
   };
 
+
+  //Remover um produto do carrinho //
   const removeProduct = (productId: number) => {
     try {
       // TODO
@@ -48,12 +61,20 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     }
   };
 
+  // Atualizar o estoque de um produto no carrinho //
   const updateProductAmount = async ({
     productId,
     amount,
   }: UpdateProductAmount) => {
     try {
-      // TODO
+
+      const response = await api.get(`stock/${productId}`);
+      const totalAmount = response.data.amount;
+
+      if((totalAmount <= amount)){
+        return
+      }
+
     } catch {
       // TODO
     }

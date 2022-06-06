@@ -4,11 +4,18 @@ import { MdShoppingBasket } from 'react-icons/md';
 
 import logo from '../../assets/images/logo.svg';
 import { Container, Cart } from './styles';
-import { useCart } from '../../hooks/useCart';
+// import { useCart } from '../../hooks/useCart';
 
 const Header = (): JSX.Element => {
   // const { cart } = useCart();
-  // const cartSize = // TODO;
+
+  //Mostar em tela quantos produtos distintos existem no carrinho
+  // const cartSize = cart.filter((product)=>{
+  //   console.log(`produto ${product}`)
+  //   return product
+  // })
+
+  // console.log(cartSize)
 
   return (
     <Container>
