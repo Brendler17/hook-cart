@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext, useState } from 'react';
 import { toast } from 'react-toastify';
 import { api } from '../services/api';
-import { Product, Stock } from '../types';
+import { Product } from '../types';
 
 interface CartProviderProps {
   children: ReactNode;
@@ -34,17 +34,20 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
   console.log('carrinho', cart)
 
-  // Adicionar um produto ao carrinho //
+  // Adicionar um produto ao carrinho X//
   const addProduct = async (productId: number) => {
     try {
-      let response = await api.get(`/products/${productId}`);
+      let productResponse = await api.get(`/products/${productId}`);
+      const stockResponse = await api.get(`stock/${productId}`);
+      const stockLimit = stockResponse.data.amount;
 
-      response.data = {
-        ...response.data,
-        amount: 1
+      productResponse.data = {
+        ...productResponse.data,
+        amount: 1,
+        stockLimit
       }
 
-      setCart([...cart, response.data]);
+      setCart([...cart, productResponse.data]);
 
     } catch {
       // TODO
@@ -52,16 +55,19 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
   };
 
 
-  //Remover um produto do carrinho //
+  //Remover um produto do carrinho X//
   const removeProduct = (productId: number) => {
     try {
-      // TODO
+
+      const newCart = cart.filter(product => product.id !== productId);
+      setCart(newCart);
+
     } catch {
       // TODO
     }
   };
 
-  // Atualizar o estoque de um produto no carrinho //
+  // Atualizar o estoque de um produto no carrinho X//
   const updateProductAmount = async ({
     productId,
     amount,
@@ -71,8 +77,18 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
       const response = await api.get(`stock/${productId}`);
       const totalAmount = response.data.amount;
 
-      if((totalAmount <= amount)){
-        return
+      const hasStock = totalAmount >= amount;
+
+      if (hasStock) {
+        const newCart = cart.map(product => product.id === productId ? {
+          ...product,
+          amount: amount
+        } : product);
+
+        setCart(newCart);
+
+      } else {
+        console.log('sem estoque')
       }
 
     } catch {

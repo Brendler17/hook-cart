@@ -15,6 +15,7 @@ interface Product {
 
 interface ProductFormatted extends Product {
   priceFormatted: string;
+  amount: number;
 }
 
 interface CartItemsAmount {
@@ -23,11 +24,11 @@ interface CartItemsAmount {
 
 const Home = (): JSX.Element => {
   const [products, setProducts] = useState<ProductFormatted[]>([]);
-  const { cart, addProduct } = useCart();
+  const { cart, addProduct, updateProductAmount } = useCart();
 
   // lógica para quantidade de cada produto no carrinho X //
   const cartItemsAmount = cart.reduce((sumAmount, product) => {
-    sumAmount[product.id]++;
+    sumAmount[product.id] += product.amount;
 
     return sumAmount
   }, {
@@ -52,22 +53,22 @@ const Home = (): JSX.Element => {
   // adicionar produto ao carrinho X //
   function handleAddProduct(id: number) {
 
-    // verificar se já existe produto no carrinho
-    //  const hasProduct = cart.find((product) => {
-    //   return product.id === id;
-    //  })
-
-    //  if(hasProduct){
-    //   return 
-    //  }
-
-    addProduct(id);
+    const product = cart.find(product => product.id === id);
+    if (product) {
+      updateProductAmount({
+        productId: id,
+        amount: product.amount + 1
+      })
+    } else {
+      addProduct(id);
+    }
+    
   }
 
   return (
     <ProductList>
       {products.map((product) => (
-        <li>
+        <li key={product.id}>
           <img src={product.image} alt={product.title} />
           <strong>{product.title}</strong>
           <span>{formatPrice(product.price)}</span>
